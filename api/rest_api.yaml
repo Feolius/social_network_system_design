@@ -1,0 +1,576 @@
+openapi: 3.0.3
+info:
+    title: Openapi documentation for Впути social network
+    description: |-
+        Error responses are skipped
+    version: 0.0.1
+tags:
+    -   name: authentication
+        description: Authentication related endpoints
+    -   name: post
+        description: Currency related endpoints
+    -   name: user
+        description: User related endpoints
+    -   name: user-subscription
+        description: User subscription related endpoint
+    -   name: image
+        description: Image processing endpoints
+    -   name: comment
+        description: Post comment related endpoints
+    -   name: location
+        description: Location related endpoints
+paths:
+    /user/login:
+        post:
+            tags:
+                - authentication
+            description: Authentication endpoint
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                username:
+                                    type: string
+                                password:
+                                    type: string
+            responses:
+                200:
+                    description: Bearer token response
+                    content:
+                        application/json:
+                            schema:
+                                properties:
+                                    token:
+                                        type: string
+    /user:
+        get:
+            security:
+                -   bearerAuth: [ ]
+            tags:
+                - user
+            description: Get account information
+            responses:
+                200:
+                    $ref: '#/components/responses/UserResponse'
+        post:
+            tags:
+                - user
+            description: Create a new account
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                -   $ref: '#/components/schemas/UserNonEditableData'
+                                -   $ref: '#/components/schemas/UserEditableData'
+                                -   type: object
+                                    properties:
+                                        password:
+                                            type: string
+                                        repeatPassword:
+                                            type: string
+                                        avatar:
+                                            $ref: '#/components/schemas/ImageId'
+
+            responses:
+                200:
+                    $ref: '#/components/responses/SuccessfulResponse'
+        put:
+            security:
+                -   bearerAuth: [ ]
+            tags:
+                - user
+            description: Edit own account
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                -   $ref: '#/components/schemas/UserEditableData'
+                                -   type: object
+                                    properties:
+                                        avatar:
+                                            $ref: '#/components/schemas/ImageId'
+            responses:
+                200:
+                    $ref: '#/components/responses/UserResponse'
+        delete:
+            security:
+                -   bearerAuth: [ ]
+            tags:
+                - user
+            description: Delete own account
+            responses:
+                200:
+                    $ref: '#/components/responses/SuccessfulResponse'
+    /user/{userId}:
+        get:
+            security:
+                -   bearerAuth: [ ]
+            tags:
+                - user
+            parameters:
+                -   $ref: '#/components/parameters/UserId'
+            description: Get user information
+            responses:
+                200:
+                    $ref: '#/components/responses/UserResponse'
+    /user-subscription:
+        get:
+            security:
+                -   bearerAuth: [ ]
+            tags:
+                - user-subscription
+            parameters:
+                -   $ref: '#/components/parameters/PageNo'
+            description: List of users current user subscribed to
+            responses:
+                200:
+                    $ref: '#/components/responses/UsersResponse'
+    /user-subscription/{userId}:
+        post:
+            security:
+                -   bearerAuth: [ ]
+            tags:
+                - user-subscription
+            parameters:
+                -   $ref: '#/components/parameters/UserId'
+            description: Subscribe to user posts
+            responses:
+                200:
+                    $ref: '#/components/responses/SuccessfulResponse'
+        delete:
+            security:
+                -   bearerAuth: [ ]
+            tags:
+                - user-subscription
+            parameters:
+                -   $ref: '#/components/parameters/UserId'
+            description: Unsubscribe from user posts
+            responses:
+                200:
+                    $ref: '#/components/responses/SuccessfulResponse'
+
+    /image:
+        post:
+            security:
+                -   bearerAuth: [ ]
+            tags:
+                - image
+            description: Upload image
+            requestBody:
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: object
+                            required:
+                                - file
+                            properties:
+                                file:
+                                    description: Image file
+                                    type: string
+                                    format: binary
+            responses:
+                200:
+                    description: Response containing uploaded image id
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    id:
+                                        $ref: '#/components/schemas/ImageId'
+    /post:
+        get:
+            security:
+                -   bearerAuth: [ ]
+            tags:
+                - post
+            description: User posts thread
+            parameters:
+                -   $ref: '#/components/parameters/PageNo'
+            responses:
+                200:
+                    $ref: '#/components/responses/PostsResponse'
+        post:
+            security:
+                -   bearerAuth: [ ]
+            tags:
+                - post
+            description: Create a new post
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PostRequestData'
+            responses:
+                200:
+                    $ref: '#/components/responses/PostResponse'
+    /post/{postId}:
+        get:
+            security:
+                -   bearerAuth: [ ]
+            tags:
+                - post
+            description: Retrieve certain post content
+            parameters:
+                -   $ref: '#/components/parameters/PostId'
+            responses:
+                200:
+                    $ref: '#/components/responses/PostResponse'
+        put:
+            security:
+                -   bearerAuth: [ ]
+            tags:
+                - post
+            description: Edit post content
+            parameters:
+                -   $ref: '#/components/parameters/PostId'
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PostRequestData'
+            responses:
+                200:
+                    $ref: '#/components/responses/PostResponse'
+        delete:
+            security:
+                -   bearerAuth: [ ]
+            tags:
+                - post
+            description: Retrieve certain post content
+            parameters:
+                -   $ref: '#/components/parameters/PostId'
+            responses:
+                200:
+                    $ref: '#/components/responses/SuccessfulResponse'
+    /post/{postId}/comment:
+        get:
+            security:
+                -   bearerAuth: [ ]
+            tags:
+                - comment
+            description: Retrieve certain post content
+            parameters:
+                -   $ref: '#/components/parameters/PostId'
+                -   $ref: '#/components/parameters/PageNo'
+            responses:
+                200:
+                    $ref: '#/components/responses/CommentsResponse'
+        post:
+            security:
+                -   bearerAuth: [ ]
+            tags:
+                - comment
+            description: Create a new comment
+            parameters:
+                -   $ref: '#/components/parameters/PostId'
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Comment'
+            responses:
+                200:
+                    $ref: '#/components/responses/CommentResponse'
+    /post/{postId}/like:
+        post:
+            security:
+                -   bearerAuth: [ ]
+            tags:
+                - post
+            description: Like this post
+            parameters:
+                - $ref: '#/components/parameters/PostId'
+            responses:
+                200:
+                    $ref: '#/components/responses/SuccessfulResponse'
+        delete:
+            security:
+                -   bearerAuth: [ ]
+            tags:
+                - post
+            description: Unlike this post
+            parameters:
+                -   $ref: '#/components/parameters/PostId'
+            responses:
+                200:
+                    $ref: '#/components/responses/SuccessfulResponse'
+    /location:
+        get:
+            # this one might be split into 2: one is for autocompletion only with (id, aggregated description) pairs in response and
+            # another is /location/{locationId} for concrete location retrieval.
+            security:
+                -   bearerAuth: [ ]
+            tags:
+                - location
+            description: Search for location
+            parameters:
+                -   $ref: '#/components/parameters/Name'
+            responses:
+                200:
+                    $ref: '#/components/responses/LocationsResponse'
+        post:
+            security:
+                -   bearerAuth: [ ]
+            tags:
+                - location
+            description: Create a new location
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Location'
+            responses:
+                200:
+                    $ref: '#/components/responses/LocationResponse'
+    /location/{locationId}/post:
+        get:
+            security:
+                -   bearerAuth: [ ]
+            tags:
+                - post
+            parameters:
+                -   $ref: '#/components/parameters/LocationId'
+                -   $ref: '#/components/parameters/PageNo'
+                -   name: sortBy
+                    in: query
+                    schema:
+                        type: string
+                        enum: [ 'date', 'popularity' ]
+            description: Get location related posts
+            responses:
+                200:
+                    $ref: '#/components/responses/PostsResponse'
+components:
+    securitySchemes:
+        bearerAuth:
+            type: http
+            scheme: bearer
+    schemas:
+        UserId:
+            type: string
+            format: uuid
+            description: User Id (uuid v7)
+        PostId:
+            type: string
+            format: uuid
+            description: Post Id (uuid v7)
+        LocationId:
+            type: string
+            format: uuid
+            description: Location Id (uuid v7)
+        ImageId:
+            type: string
+            format: uuid
+            description: Image Id (uuid v7)
+        CommentId:
+            type: string
+            format: uuid
+            description: Image Id (uuid v7)
+        UserNonEditableData:
+            allOf:
+                -   type: object
+                    properties:
+                        email:
+                            type: string
+                        username:
+                            type: string
+                -   $ref: '#/components/schemas/UserEditableData'
+        UserEditableData:
+            type: object
+            properties:
+                firstName:
+                    type: string
+                lastName:
+                    type: string
+                description:
+                    type: string
+        UserResponseData:
+            allOf:
+                -   type: object
+                    properties:
+                        id:
+                            $ref: '#/components/schemas/UserId'
+                -   $ref: '#/components/schemas/UserNonEditableData'
+                -   type: object
+                    properties:
+                        avatarUrl:
+                            type: string
+        PostCommonData:
+            type: object
+            properties:
+                title:
+                    type: string
+                text:
+                    type: string
+                location:
+                    $ref: '#/components/schemas/LocationId'
+                rate:
+                    type: integer
+                    description: Location rate from 1 to 10
+        PostRequestData:
+            allOf:
+                -   $ref: '#/components/schemas/PostCommonData'
+                -   type: object
+                    properties:
+                        photos:
+                            type: array
+                            items:
+                                $ref: '#/components/schemas/ImageId'
+        PostResponseData:
+            allOf:
+                -   type: object
+                    properties:
+                        id:
+                            $ref: '#/components/schemas/PostId'
+                -   $ref: '#/components/schemas/UserNonEditableData'
+                -   type: object
+                    properties:
+                        photos:
+                            type: array
+                            items:
+                                type: string
+                                description: photo url
+                        likes:
+                            type: integer
+                        likedByYou:
+                            type: boolean
+        Location:
+            type: object
+            properties:
+                name:
+                    type: string
+                country:
+                    type: string
+                province:
+                    type: string
+                city:
+                    type: string
+                lat:
+                    type: number
+                    description: Latitude in degrees. Values must be in the following range [-90, 90].
+                lng:
+                    type: number
+                    description: Longitude in degrees. Values must be in the following range [-180, 180].
+        LocationResponseData:
+            allOf:
+                -   type: object
+                    properties:
+                        id:
+                            $ref: '#/components/schemas/LocationId'
+                -   $ref: '#/components/schemas/Location'
+        Comment:
+            type: object
+            properties:
+                text:
+                    type: string
+        CommentResponseData:
+            allOf:
+                -   type: object
+                    properties:
+                        id:
+                            $ref: '#/components/schemas/CommentId'
+                -   $ref: '#/components/schemas/Comment'
+    parameters:
+        UserId:
+            name: userId
+            in: path
+            required: true
+            schema:
+                $ref: '#/components/schemas/UserId'
+        PostId:
+            name: postId
+            in: path
+            required: true
+            schema:
+                $ref: '#/components/schemas/PostId'
+        LocationId:
+            name: locationId
+            in: path
+            required: true
+            schema:
+                $ref: '#/components/schemas/LocationId'
+        PageNo:
+            name: pageNo
+            in: query
+            required: true
+            description: Page number
+            schema:
+                type: integer
+        Name:
+            name: name
+            in: query
+            required: true
+            schema:
+                properties:
+                    name:
+                        type: string
+    responses:
+        SuccessfulResponse:
+            description: General successful response
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            message:
+                                type: string
+        UserResponse:
+            description: User response
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/UserResponseData'
+        UsersResponse:
+            description: Multiple users response
+            content:
+                application/json:
+                    schema:
+                        type: array
+                        items:
+                            $ref: '#/components/schemas/UserResponseData'
+        PostResponse:
+            description: Single post response
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/PostResponseData'
+        PostsResponse:
+            description: Multiple posts response
+            content:
+                application/json:
+                    schema:
+                        type: array
+                        items:
+                            $ref: '#/components/schemas/PostResponseData'
+        CommentResponse:
+            description: Single comment response
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/CommentResponseData'
+        CommentsResponse:
+            description: Multiple comments response
+            content:
+                application/json:
+                    schema:
+                        type: array
+                        items:
+                            $ref: '#/components/schemas/CommentResponseData'
+        LocationResponse:
+            description: Single location response
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/LocationResponseData'
+        LocationsResponse:
+            description: Multiple locations response
+            content:
+                application/json:
+                    schema:
+                        type: array
+                        items:
+                            $ref: '#/components/schemas/LocationResponseData'
