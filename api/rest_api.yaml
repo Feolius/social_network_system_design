@@ -43,6 +43,11 @@ paths:
                                 properties:
                                     token:
                                         type: string
+
+                401:
+                    description: Authorization information is missing or invalid.
+                5XX:
+                    description: Unexpected error.
     /user:
         get:
             security:
@@ -53,6 +58,10 @@ paths:
             responses:
                 200:
                     $ref: '#/components/responses/UserResponse'
+                401:
+                    description: Authorization information is missing or invalid.
+                5XX:
+                    description: Unexpected error.
         post:
             tags:
                 - user
@@ -76,6 +85,12 @@ paths:
             responses:
                 200:
                     $ref: '#/components/responses/SuccessfulResponse'
+                400:
+                    description: Bad request. Validation error.
+                401:
+                    description: Authorization information is missing or invalid.
+                5XX:
+                    description: Unexpected error.
         put:
             security:
                 -   bearerAuth: [ ]
@@ -95,6 +110,12 @@ paths:
             responses:
                 200:
                     $ref: '#/components/responses/UserResponse'
+                400:
+                    description: Bad request. Validation error.
+                401:
+                    description: Authorization information is missing or invalid.
+                5XX:
+                    description: Unexpected error.
         delete:
             security:
                 -   bearerAuth: [ ]
@@ -104,6 +125,10 @@ paths:
             responses:
                 200:
                     $ref: '#/components/responses/SuccessfulResponse'
+                401:
+                    description: Authorization information is missing or invalid.
+                5XX:
+                    description: Unexpected error.
     /user/{userId}:
         get:
             security:
@@ -116,6 +141,12 @@ paths:
             responses:
                 200:
                     $ref: '#/components/responses/UserResponse'
+                401:
+                    description: Authorization information is missing or invalid.
+                404:
+                    description: Resource was not found.
+                5XX:
+                    description: Unexpected error.
     /user-subscription:
         get:
             security:
@@ -128,6 +159,12 @@ paths:
             responses:
                 200:
                     $ref: '#/components/responses/UsersResponse'
+                400:
+                    description: Bad request. Invalid parameters.
+                401:
+                    description: Authorization information is missing or invalid.
+                5XX:
+                    description: Unexpected error.
     /user-subscription/{userId}:
         post:
             security:
@@ -140,6 +177,12 @@ paths:
             responses:
                 200:
                     $ref: '#/components/responses/SuccessfulResponse'
+                401:
+                    description: Authorization information is missing or invalid.
+                404:
+                    description: A user with the specified ID was not found.
+                5XX:
+                    description: Unexpected error.
         delete:
             security:
                 -   bearerAuth: [ ]
@@ -151,6 +194,12 @@ paths:
             responses:
                 200:
                     $ref: '#/components/responses/SuccessfulResponse'
+                401:
+                    description: Authorization information is missing or invalid.
+                404:
+                    description: A user with the specified ID was not found.
+                5XX:
+                    description: Unexpected error.
 
     /image:
         post:
@@ -181,6 +230,12 @@ paths:
                                 properties:
                                     id:
                                         $ref: '#/components/schemas/ImageId'
+                400:
+                    description: Bad request. Max upload file size is exceeded.
+                401:
+                    description: Authorization information is missing or invalid.
+                5XX:
+                    description: Unexpected error.
     /post:
         get:
             security:
@@ -193,6 +248,12 @@ paths:
             responses:
                 200:
                     $ref: '#/components/responses/PostsResponse'
+                400:
+                    description: Bad request. Invalid parameters.
+                401:
+                    description: Authorization information is missing or invalid.
+                5XX:
+                    description: Unexpected error.
         post:
             security:
                 -   bearerAuth: [ ]
@@ -207,6 +268,12 @@ paths:
             responses:
                 200:
                     $ref: '#/components/responses/PostResponse'
+                400:
+                    description: Bad request. Validation error.
+                401:
+                    description: Authorization information is missing or invalid.
+                5XX:
+                    description: Unexpected error.
     /post/{postId}:
         get:
             security:
@@ -219,6 +286,12 @@ paths:
             responses:
                 200:
                     $ref: '#/components/responses/PostResponse'
+                401:
+                    description: Authorization information is missing or invalid.
+                404:
+                    description: A post with the specified ID was not found.
+                5XX:
+                    description: Unexpected error.
         put:
             security:
                 -   bearerAuth: [ ]
@@ -235,17 +308,31 @@ paths:
             responses:
                 200:
                     $ref: '#/components/responses/PostResponse'
+                400:
+                    description: Bad request. Validation error.
+                401:
+                    description: Authorization information is missing or invalid.
+                404:
+                    description: A post with the specified ID was not found.
+                5XX:
+                    description: Unexpected error.
         delete:
             security:
                 -   bearerAuth: [ ]
             tags:
                 - post
-            description: Retrieve certain post content
+            description: Delete a certain post content
             parameters:
                 -   $ref: '#/components/parameters/PostId'
             responses:
                 200:
                     $ref: '#/components/responses/SuccessfulResponse'
+                401:
+                    description: Authorization information is missing or invalid.
+                404:
+                    description: A post with the specified ID was not found.
+                5XX:
+                    description: Unexpected error.
     /post/{postId}/comment:
         get:
             security:
@@ -259,6 +346,12 @@ paths:
             responses:
                 200:
                     $ref: '#/components/responses/CommentsResponse'
+                401:
+                    description: Authorization information is missing or invalid.
+                404:
+                    description: A post with the specified ID was not found.
+                5XX:
+                    description: Unexpected error.
         post:
             security:
                 -   bearerAuth: [ ]
@@ -275,6 +368,14 @@ paths:
             responses:
                 200:
                     $ref: '#/components/responses/CommentResponse'
+                400:
+                    description: Bad request. Validation error.
+                401:
+                    description: Authorization information is missing or invalid.
+                404:
+                    description: A post with the specified ID was not found.
+                5XX:
+                    description: Unexpected error.
     /post/{postId}/like:
         post:
             security:
@@ -287,6 +388,12 @@ paths:
             responses:
                 200:
                     $ref: '#/components/responses/SuccessfulResponse'
+                401:
+                    description: Authorization information is missing or invalid.
+                404:
+                    description: A post with the specified ID was not found.
+                5XX:
+                    description: Unexpected error.
         delete:
             security:
                 -   bearerAuth: [ ]
@@ -298,6 +405,12 @@ paths:
             responses:
                 200:
                     $ref: '#/components/responses/SuccessfulResponse'
+                401:
+                    description: Authorization information is missing or invalid.
+                404:
+                    description: A post with the specified ID was not found.
+                5XX:
+                    description: Unexpected error.
     /location:
         get:
             # this one might be split into 2: one is for autocompletion only with (id, aggregated description) pairs in response and
@@ -312,6 +425,12 @@ paths:
             responses:
                 200:
                     $ref: '#/components/responses/LocationsResponse'
+                400:
+                    description: Bad request. Invalid parameters.
+                401:
+                    description: Authorization information is missing or invalid.
+                5XX:
+                    description: Unexpected error.
         post:
             security:
                 -   bearerAuth: [ ]
@@ -326,6 +445,12 @@ paths:
             responses:
                 200:
                     $ref: '#/components/responses/LocationResponse'
+                400:
+                    description: Bad request. Validation error.
+                401:
+                    description: Authorization information is missing or invalid.
+                5XX:
+                    description: Unexpected error.
     /location/{locationId}/post:
         get:
             security:
@@ -344,6 +469,14 @@ paths:
             responses:
                 200:
                     $ref: '#/components/responses/PostsResponse'
+                400:
+                    description: Bad request. Invalid parameters.
+                401:
+                    description: Authorization information is missing or invalid.
+                404:
+                    description: A location with the specified ID was not found.
+                5XX:
+                    description: Unexpected error.
 components:
     securitySchemes:
         bearerAuth:
