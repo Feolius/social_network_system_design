@@ -11,7 +11,7 @@ tags:
         description: Currency related endpoints
     -   name: user
         description: User related endpoints
-    -   name: user-subscription
+    -   name: subscription
         description: User subscription related endpoint
     -   name: image
         description: Image processing endpoints
@@ -20,7 +20,7 @@ tags:
     -   name: location
         description: Location related endpoints
 paths:
-    /user/login:
+    /users/login:
         post:
             tags:
                 - authentication
@@ -48,7 +48,7 @@ paths:
                     description: Authorization information is missing or invalid.
                 5XX:
                     description: Unexpected error.
-    /user:
+    /users:
         get:
             security:
                 -   bearerAuth: [ ]
@@ -129,7 +129,7 @@ paths:
                     description: Authorization information is missing or invalid.
                 5XX:
                     description: Unexpected error.
-    /user/{userId}:
+    /users/{userId}:
         get:
             security:
                 -   bearerAuth: [ ]
@@ -147,7 +147,7 @@ paths:
                     description: Resource was not found.
                 5XX:
                     description: Unexpected error.
-    /user-subscription:
+    /subscriptions:
         get:
             security:
                 -   bearerAuth: [ ]
@@ -165,7 +165,7 @@ paths:
                     description: Authorization information is missing or invalid.
                 5XX:
                     description: Unexpected error.
-    /user-subscription/{userId}:
+    /subscriptions/{userId}:
         post:
             security:
                 -   bearerAuth: [ ]
@@ -201,7 +201,7 @@ paths:
                 5XX:
                     description: Unexpected error.
 
-    /image:
+    /images:
         post:
             security:
                 -   bearerAuth: [ ]
@@ -236,7 +236,7 @@ paths:
                     description: Authorization information is missing or invalid.
                 5XX:
                     description: Unexpected error.
-    /post:
+    /posts:
         get:
             security:
                 -   bearerAuth: [ ]
@@ -274,7 +274,7 @@ paths:
                     description: Authorization information is missing or invalid.
                 5XX:
                     description: Unexpected error.
-    /post/{postId}:
+    /posts/{postId}:
         get:
             security:
                 -   bearerAuth: [ ]
@@ -333,7 +333,7 @@ paths:
                     description: A post with the specified ID was not found.
                 5XX:
                     description: Unexpected error.
-    /post/{postId}/comment:
+    /posts/{postId}/comments:
         get:
             security:
                 -   bearerAuth: [ ]
@@ -376,7 +376,7 @@ paths:
                     description: A post with the specified ID was not found.
                 5XX:
                     description: Unexpected error.
-    /post/{postId}/like:
+    /posts/{postId}/likes:
         post:
             security:
                 -   bearerAuth: [ ]
@@ -411,7 +411,7 @@ paths:
                     description: A post with the specified ID was not found.
                 5XX:
                     description: Unexpected error.
-    /location:
+    /locations:
         get:
             # this one might be split into 2: one is for autocompletion only with (id, aggregated description) pairs in response and
             # another is /location/{locationId} for concrete location retrieval.
@@ -451,7 +451,7 @@ paths:
                     description: Authorization information is missing or invalid.
                 5XX:
                     description: Unexpected error.
-    /location/{locationId}/post:
+    /locations/{locationId}/posts:
         get:
             security:
                 -   bearerAuth: [ ]
