@@ -152,7 +152,7 @@ paths:
             security:
                 -   bearerAuth: [ ]
             tags:
-                - user-subscription
+                - subscription
             parameters:
                 -   $ref: '#/components/parameters/PageNo'
             description: List of users current user subscribed to
@@ -170,7 +170,7 @@ paths:
             security:
                 -   bearerAuth: [ ]
             tags:
-                - user-subscription
+                - subscription
             parameters:
                 -   $ref: '#/components/parameters/UserId'
             description: Subscribe to user posts
@@ -187,7 +187,7 @@ paths:
             security:
                 -   bearerAuth: [ ]
             tags:
-                - user-subscription
+                - subscription
             parameters:
                 -   $ref: '#/components/parameters/UserId'
             description: Unsubscribe from user posts
@@ -559,7 +559,7 @@ components:
                     properties:
                         id:
                             $ref: '#/components/schemas/PostId'
-                -   $ref: '#/components/schemas/UserNonEditableData'
+                -   $ref: '#/components/schemas/PostCommonData'
                 -   type: object
                     properties:
                         photos:
