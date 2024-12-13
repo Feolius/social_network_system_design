@@ -8,8 +8,6 @@ Table users {
   id uuid [primary key]
   username varchar
   email varchar
-  password varchar
-  password_salt varchar
   first_name varchar
   last_name varchar
   description varchar
@@ -30,20 +28,17 @@ Table posts {
 
 Table photos {
   id uuid [primary key]
+  post_id uuid
   user_id uuid
   s3_key varchar
   created_at timestamp
-}
-
-Table posts_photos {
-  post_id uuid [primary key]
-  photo_id uuid [primary key]
 }
 
 Table comments {
   id uuid
   post_id uuid
   text text
+  created_at timestamp
 }
 
 Table likes {
@@ -73,10 +68,6 @@ Ref: "locations"."id" < "posts"."location_id"
 
 Ref: "photos"."id" < "users"."avatar_id"
 
-Ref: "posts"."id" < "posts_photos"."post_id"
-
-Ref: "photos"."id" < "posts_photos"."photo_id"
-
 Ref: "posts"."id" < "comments"."id"
 
 Ref: "localities"."id" < "locations"."locality_id"
@@ -87,8 +78,8 @@ Ref: "users"."id" < "likes"."user_id"
 
 Ref: "users"."id" < "posts"."user_id"
 
-Ref: "users"."id" < "photos"."user_id"
-
 Ref: "users"."id" < "subscriptions"."user_id"
 
 Ref: "users"."id" < "subscriptions"."followed_user_id"
+
+Ref: "posts"."id" < "photos"."post_id"
