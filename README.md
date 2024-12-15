@@ -235,3 +235,25 @@ _traffic (read) = 200 * 1200 * 10 = 2.4 mb/s_
 2 ssd (sata) по 16 tb
 
 Выбираем 10 HDD дисков, т.к. характер нагрузки iops + дешевле.
+
+
+## Хранение данных
+### Посты
+
+* async RF 3 master-slave (преобладает read)
+* 2 disks by host => 10 shards * 3 => 30 hosts
+
+### Лайки
+
+* RF 1 (преобладает write)
+* 2 disks by host => 5 shards => 5 hosts
+
+### Посты (картинки)
+
+* RF 1 (дорого будет реплики делать)
+* 6 ssd by host => 10 shards => 10 hosts
+
+### Комментарии
+
+* async RF 3 master-slave (преобладает read)
+* 2 disks by host => 5 shards * 3 => 15 hosts
