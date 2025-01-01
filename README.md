@@ -245,12 +245,12 @@ _traffic (read) = 200 * 1200 * 10 = 2.4 mb/s_
 
 ### Лайки
 
-* RF 1 (преобладает write)
-* 2 disks by host => 5 shards => 5 hosts
+* async RF 2 (для надежного хранения)
+* 2 disks by host => 5 shards * 2 => 10 hosts
 
 ### Посты (картинки)
 
-* RF 2 (дорого будет реплики делать)
+* async RF 2 (для надежного хранения)
 * 6 ssd by host => 10 shards => 20 hosts
 
 ### Комментарии
