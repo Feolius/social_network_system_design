@@ -1,0 +1,72 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+Person(user, "User")
+
+System(webapp, "Web App", "Application user interracts with")
+System_Ext(CDN, "CDN")
+System(apiGateway, "API Gateway")
+
+System_Boundary(media, "Media") {
+    Container(mediaSvc, "Media Service")
+    ContainerDb(mediaStorage, "Media Storage", "S3 storage")
+    ContainerDb(mediaDb, "Media DB", "PgSql", "Stores recent media")
+    Container(mediaCleanerSvc, "Media Cleaner Service", "Cleans up orphaned media")
+}
+
+System_Boundary(likes, "Likes") {
+    Container(likesSvc, "Likes Service")
+    ContainerDb(likesDb, "Likes DB", "PgSql")
+    ContainerDb(likesOpCache, "Likes Operations Cache", "Reddis", "Aggregates posts likes operations")
+}
+
+System_Boundary(posts, "Posts") {
+    Container(postsSvc, "Posts Service")
+    ContainerDb(postsDb, "Posts DB", "PgSql")
+}
+
+System_Boundary(comments, "Comments") {
+    Container(commentsSvc, "Comments Service")
+    ContainerDb(commentsDb, "Comments DB", "PgSql")
+}
+
+System_Boundary(users, "Users") {
+    Container(usersSvc, "Users Service")
+    ContainerDb(usersDb, "Users DB", "PgSql", "Stores users and subscriptions")
+}
+
+System_Boundary(feeds, "Feeds") {
+    Container(feedsSvc, "Feeds Service")
+    AddProperty("12", "[{...}]")
+    AddProperty("34", "[{...}]")
+    ContainerDb(feedsDb, "Feeds DB", "Reddis", "Stores home_feeds and user_feeds user_id based posts sequences")
+}
+
+System_Boundary(locations, "Locations") {
+    Container(locationsSvc, "Locations Service")
+    ContainerDb(locationsDb, "Locations DB", "PgSql")
+}
+
+SystemQueue(kafka, "Kafka") {
+    ContainerQueue(postCrudTopic, "Post CRUD", "topic", "Can be split into separate topics")
+    ContainerQueue(newSubscriptionTopic, "New Subscription", "topic")
+    ContainerQueue(deleteSubscriptionTopic, "Delete Subscription", "topic")
+}
+
+Rel(user, webapp, "Uses", "HTTPS")
+Rel(webapp, CDN, "Uses", "HTTPS")
+Rel(webapp, apiGateway, "Uses", "HTTPS")
+Rel(apiGateway, mediaSvc, "Uses", "RPC")
+Rel(apiGateway, likesSvc, "Uses", "RPC")
+Rel(apiGateway, postsSvc, "Uses", "RPC")
+Rel(apiGateway, commentsSvc, "Uses", "RPC")
+Rel(apiGateway, usersSvc, "Uses", "RPC")
+Rel(apiGateway, feedsSvc, "Uses", "RPC")
+Rel(apiGateway, locationsSvc, "Uses", "RPC")
+Rel(likesSvc, postsSvc, "Uses", "Update likes counter", "RPC")
+Rel(postsSvc, postCrudTopic, "Uses", "TCP", "Publish message")
+Rel(usersSvc, newSubscriptionTopic, "Uses", "TCP", "Publish message")
+Rel(usersSvc, deleteSubscriptionTopic, "Uses", "TCP", "Publish message")
+Rel(feedsSvc, kafka, "TCP", "Subscription")
+Rel(feedsSvc, postsSvc, "Uses", "RPC", "Load posts if local data is not sufficient")
+Rel(feedsSvc, usersSvc, "Uses", "RPC", "Load subscriptions if local data is not sufficient")
+@enduml
