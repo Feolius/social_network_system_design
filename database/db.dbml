@@ -24,6 +24,7 @@ Table posts {
   rate integer
   created_at timestamp
   updated_at timestamp
+  likes int
 }
 
 Table photos {
