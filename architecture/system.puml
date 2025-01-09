@@ -7,43 +7,42 @@ System_Ext(CDN, "CDN")
 System(apiGateway, "API Gateway")
 
 System_Boundary(media, "Media") {
-    Container(mediaSvc, "Media Service")
-    ContainerDb(mediaStorage, "Media Storage", "S3 storage")
-    ContainerDb(mediaDb, "Media DB", "PgSql", "Stores recent media")
-    Container(mediaCleanerSvc, "Media Cleaner Service", "Cleans up orphaned media")
+    Container(mediaSvc, "Media Service",, "Put uploaded media into media storage and media db")
+    ContainerDb(mediaStorage, "Media Storage",, "S3 blob storage. Stores media objects with their keys.")
+    ContainerDb(mediaDb, "Media DB", "PgSql", "Stores recent media: s3_key, date")
+    Container(mediaCleanerSvc, "Media Cleaner Service",, "Periodical job runner that goes through records in Media DB and check if the media is used. Removes the media if it is not. Remove the record after processing.")
 }
 
 System_Boundary(likes, "Likes") {
-    Container(likesSvc, "Likes Service")
-    ContainerDb(likesDb, "Likes DB", "PgSql")
-    ContainerDb(likesOpCache, "Likes Operations Cache", "Reddis", "Aggregates posts likes operations")
+    Container(likesSvc, "Likes Service",,"Accepts posts like/dislike requests and increase/decrease corresponding counter in Operation Cache. Flush Operation Cache data into Posts Service where likes counter is stored persistently.")
+    ContainerDb(likesOpCache, "Likes Operations Cache", "Reddis", "Stores post_id and likes counter (positive or negative)")
 }
 
 System_Boundary(posts, "Posts") {
-    Container(postsSvc, "Posts Service")
-    ContainerDb(postsDb, "Posts DB", "PgSql")
+    Container(postsSvc, "Posts Service",, "Performs posts CRUD operations.")
+    ContainerDb(postsDb, "Posts DB", "PgSql", "Stores posts data")
 }
 
-System_Boundary(comments, "Comments") {
-    Container(commentsSvc, "Comments Service")
-    ContainerDb(commentsDb, "Comments DB", "PgSql")
+System_Boundary(comments, "Comments",) {
+    Container(commentsSvc, "Comments Service",, "Performs comments CRUD operations.")
+    ContainerDb(commentsDb, "Comments DB", "PgSql", "Stores comments data")
 }
 
 System_Boundary(users, "Users") {
-    Container(usersSvc, "Users Service")
+    Container(usersSvc, "Users Service",, "Performs users and subscriptions CRUD operations")
     ContainerDb(usersDb, "Users DB", "PgSql", "Stores users and subscriptions")
 }
 
 System_Boundary(feeds, "Feeds") {
-    Container(feedsSvc, "Feeds Service")
+    Container(feedsSvc, "Feeds Service",,"Subscribes on a Posts changes and User subscriptions events. Uses it to update Feed DB accordingly. Performs post feeds reading requests using data in Feeds DB. In case of lack of data goes to original services to perform request.")
     AddProperty("12", "[{...}]")
     AddProperty("34", "[{...}]")
-    ContainerDb(feedsDb, "Feeds DB", "Reddis", "Stores home_feeds and user_feeds user_id based posts sequences")
+    ContainerDb(feedsDb, "Feeds DB", "Reddis", "Stores home_feeds and user_feeds posts sequences keyed by user_id")
 }
 
 System_Boundary(locations, "Locations") {
-    Container(locationsSvc, "Locations Service")
-    ContainerDb(locationsDb, "Locations DB", "PgSql")
+    Container(locationsSvc, "Locations Service",, "Performs locations creation and search requests")
+    ContainerDb(locationsDb, "Locations DB", "PgSql", "Stores locations data")
 }
 
 SystemQueue(kafka, "Kafka") {
@@ -62,11 +61,14 @@ Rel(apiGateway, commentsSvc, "Uses", "RPC")
 Rel(apiGateway, usersSvc, "Uses", "RPC")
 Rel(apiGateway, feedsSvc, "Uses", "RPC")
 Rel(apiGateway, locationsSvc, "Uses", "RPC")
-Rel(likesSvc, postsSvc, "Uses", "Update likes counter", "RPC")
+Rel(likesSvc, postsSvc, "Uses", "RPC", "Update likes counter")
 Rel(postsSvc, postCrudTopic, "Uses", "TCP", "Publish message")
 Rel(usersSvc, newSubscriptionTopic, "Uses", "TCP", "Publish message")
 Rel(usersSvc, deleteSubscriptionTopic, "Uses", "TCP", "Publish message")
 Rel(feedsSvc, kafka, "TCP", "Subscription")
 Rel(feedsSvc, postsSvc, "Uses", "RPC", "Load posts if local data is not sufficient")
 Rel(feedsSvc, usersSvc, "Uses", "RPC", "Load subscriptions if local data is not sufficient")
+Rel(mediaCleanerSvc, postsSvc, "Uses", "RPC", "Media usage query")
+Rel(postsSvc, locationsSvc, "Uses", "RPC", "Location parameter validation")
+Rel(commentsSvc, postsSvc, "Uses", "RPC", "Post parameter validation")
 @enduml
