@@ -2,7 +2,7 @@
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 Person(user, "User")
 
-System(webapp, "Web App", "Application user interracts with")
+System(webapp, "Web App")
 System_Ext(CDN, "CDN")
 System(apiGateway, "API Gateway")
 
@@ -10,7 +10,7 @@ System_Boundary(media, "Media") {
     Container(mediaSvc, "Media Service",, "Put uploaded media into media storage and media db")
     ContainerDb(mediaStorage, "Media Storage",, "S3 blob storage. Stores media objects with their keys.")
     ContainerDb(mediaDb, "Media DB", "PgSql", "Stores recent media: s3_key, date")
-    Container(mediaCleanerSvc, "Media Cleaner Service",, "Periodical job runner that goes through records in Media DB and check if the media is used. Removes the media if it is not. Remove the record after processing.")
+    Container(mediaCleanerSvc, "Media Cleaner Service",, "Periodical job runner that cleanup unused media data using Media DB.")
 }
 
 System_Boundary(likes, "Likes") {
@@ -34,7 +34,7 @@ System_Boundary(users, "Users") {
 }
 
 System_Boundary(feeds, "Feeds") {
-    Container(feedsSvc, "Feeds Service",,"Subscribes on a Posts changes and User subscriptions events. Uses it to update Feed DB accordingly. Performs post feeds reading requests using data in Feeds DB. In case of lack of data goes to original services to perform request.")
+    Container(feedsSvc, "Feeds Service",,"Handle post feeds requests.")
     AddProperty("12", "[{...}]")
     AddProperty("34", "[{...}]")
     ContainerDb(feedsDb, "Feeds DB", "Reddis", "Stores home_feeds and user_feeds posts sequences keyed by user_id")
